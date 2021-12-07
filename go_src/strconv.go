@@ -5,7 +5,7 @@ import (
 	"strconv" // 1.16.5
 )
 
-func main() {
+func learnStrconv() {
 	// 这篇文章总结的挺好的: https://www.cnblogs.com/golove/p/3262925.html
 
 	// 格式化 int，给定进制（进制 ∈ [2, 36]）
