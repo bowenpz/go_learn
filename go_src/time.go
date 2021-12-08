@@ -1,5 +1,8 @@
 package main
 
-func learnTime() {
+import "time"
 
+func learnTime() {
+	now := time.Now()
+	println(now.Unix())
 }
