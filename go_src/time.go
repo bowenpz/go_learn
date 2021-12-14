@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+// —————————————————————————————————————————————
+// —————————————— 翻译：time 包注释 ——————————————
+// —————————————————————————————————————————————
+
 // Package time provides functionality for measuring and displaying time.
 // time 包提供了测量和显示时间的能力
 
@@ -102,6 +106,73 @@ import (
 // that difference will be visible when printing t.String() and u.String().
 // 在调试时，如果时间对象 t 内部存在 monotonic clock 时间，t.String 方法会返回该时间。
 // 如果两个时间对象 t 和 u 因为 monotonic clock 不同而不同，可以通过 t.String() 和 u.String() 方法显示出来。
+
+// ——————————————————————————————————————————————————
+// —————————————— 翻译：time.Time 类注释 ——————————————
+// ——————————————————————————————————————————————————
+
+// A Time represents an instant in time with nanosecond precision.
+// time.Time 类代表着一个精度到纳秒的时间戳（time instant）。
+
+// Programs using times should typically store and pass them as values,
+// not pointers. That is, time variables and struct fields should be of
+// type time.Time, not *time.Time.
+// 程序在存储和传递时间对象时，应该使用值类型，而非指针类型。
+// 因此，在使用 time 变量和结构体时，应当使用 time.Time，而非 *time.Time。
+
+// A Time value can be used by multiple goroutines simultaneously except
+// that the methods GobDecode, UnmarshalBinary, UnmarshalJSON and
+// UnmarshalText are not concurrency-safe.
+// time.Time 对象在多 goroutine 环境下，除了 GobDecode、UnmarshalBinary、UnmarshalJSON 和 UnmarshalText 这四个方法下不是并发安全之外，其余都并发安全。
+
+// Time instants can be compared using the Before, After, and Equal methods.
+// The Sub method subtracts two instants, producing a Duration.
+// The Add method adds a Time and a Duration, producing a Time.
+// 时间戳可以使用 Before、After、Equal 方法进行比较。
+// Sub 方法对两个 time.Time 相减，得到一个 time.Duration。
+// Add 方法把 time.Time 和 time.Duration 相加，得到一个 time.Time。
+
+// The zero value of type Time is January 1, year 1, 00:00:00.000000000 UTC.
+// As this time is unlikely to come up in practice, the IsZero method gives
+// a simple way of detecting a time that has not been initialized explicitly.
+// time.Time 的零值是公元 1 年 1 月 1 日，00:00:00.000000000 UTC。
+// 由于这个时间在实际场景中不太可能出现，因此提供 IsZero 方法检测 time.Time 对象是否被显式初始化。
+
+// Each Time has associated with it a Location, consulted when computing the
+// presentation form of the time, such as in the Format, Hour, and Year methods.
+// The methods Local, UTC, and In return a Time with a specific location.
+// Changing the location in this way changes only the presentation; it does not
+// change the instant in time being denoted and therefore does not affect the
+// computations described in earlier paragraphs.
+// 每一个 time.Time 对象会关联时区（Location）信息，用于表示时间格式，例如在 Format、Hour、Year 方法中会使用。
+// Local、UTC、In 方法会返回一个包含指定时区的 time.Time 对象。
+// 以这些方法修改时区，只会修改时间显示，不会修改时间戳，也不会影响之前已有的时间。
+
+// Representations of a Time value saved by the GobEncode, MarshalBinary,
+// MarshalJSON, and MarshalText methods store the Time.Location's offset, but not
+// the location name. They therefore lose information about Daylight Saving Time.
+// 使用 GobEncode、MarshalBinary、MarshalJSON 和 MarshalText 方法存储时间，只会包含时区偏移量（Time.Location's offset），不会存储时区名称。
+// 因此这些方法会丢失夏令时信息。
+
+// In addition to the required “wall clock” reading, a Time may contain an optional
+// reading of the current process's monotonic clock, to provide additional precision
+// for comparison or subtraction.
+// See the “Monotonic Clocks” section in the package documentation for details.
+// time.Time 除了包含必需的 wall clock 之外，还可能会包含当前程序的 monotonic clock，用于精确地比较时间、计算时间差值。
+// 有关 monotonic clock 的部分可以阅读 time 包的文档。
+
+// Note that the Go == operator compares not just the time instant but also the
+// Location and the monotonic clock reading. Therefore, Time values should not
+// be used as map or database keys without first guaranteeing that the identical Location has been set for all values
+// identical Location has been set for all values, which can be achieved
+// through use of the UTC or Local method, and that the monotonic clock reading
+// has been stripped by setting t = t.Round(0). In general, prefer t.Equal(u)
+// to t == u, since t.Equal uses the most accurate comparison available and
+// correctly handles the case when only one of its arguments has a monotonic
+// clock reading.
+// 需要注意的是，在 Go 中 == 操作符不光会比较时间戳，也会比较时区和 monotonic clock 时间。
+// 因此，如果没有使用 UTC 或 Local 方法确保时区相同，或者没有使用 t.Round(0) 去除掉 monotonic clock 时间，不应该使用 time.Time 作为 map 或数据库的 key。
+// 通常情况下，优先使用 t.Equal(u)，而不是 t == u，因为 t.Equal 方法更精确，并且能正确处理单 monotonic clock 的 case。
 
 func learnTime() {
 
