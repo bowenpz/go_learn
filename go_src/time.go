@@ -197,6 +197,57 @@ func learnTime() {
 	parseInLocation, _ := time.ParseInLocation("2006-01-02 15:04:05", "2021-12-10 00:00:00", time.Local)
 	fmt.Printf("%v", parseInLocation) // 打印：2021-12-10 00:00:00 +0800 CST
 
+	// —————————————— 使用 time.Time 对象 ——————————————
+
+	// 接下来都使用 2021-01-01 00:00:00 这个时间
+	t := time.Date(2021, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+	// 日期与时刻
+	var (
+		year                          = t.Year()
+		month                         = t.Month()
+		weekday                       = t.Weekday()
+		yearDay                       = t.YearDay()
+		day                           = t.Day()
+		hour                          = t.Hour()
+		minute                        = t.Minute()
+		second                        = t.Second()
+		nanosecond                    = t.Nanosecond()
+		isoYear, isoWeek              = t.ISOWeek()
+		dateYear, dateMonth, dateDay  = t.Date()
+		clockHour, clockMin, clockSec = t.Clock()
+	)
+	fmt.Printf("%d %d %d %d %d %d %d %d %d\n", year, month, weekday, yearDay, day, hour, minute, second, nanosecond)     // 打印：2021 1 5 1 1 0 0 0 0
+	fmt.Printf("%d %d %d %d %d %d %d %d", isoYear, isoWeek, dateYear, dateMonth, dateDay, clockHour, clockMin, clockSec) // 打印：2020 53 2021 1 1 0 0 0
+
+	// 增加时间
+	add := t.Add(time.Hour * 24)
+	fmt.Printf("%v", add) // 打印：2021-01-02 00:00:00 +0000 UTC
+
+	// 增加日期
+	addDate := t.AddDate(1, 1, 1)
+	fmt.Printf("%v", addDate) // 打印：2022-02-02 00:00:00 +0000 UTC
+
+	// 相减得到时间间隔
+	sub := t.Sub(add)
+	fmt.Printf("%v", sub) // 打印：-24h0m0s
+
+	// 是否在指定时间之前
+	isBefore := t.Before(time.Now())
+	fmt.Printf("%t", isBefore) // 打印：true
+
+	// 是否在指定时间之后
+	isAfter := t.After(time.Now())
+	fmt.Printf("%t", isAfter) // 打印：false
+
+	// 所在时区
+	location := t.Location()
+	fmt.Printf("%v", location) // 打印：UTC
+
+	// 所在时区与偏移量（秒）
+	zone, offset := t.Zone()
+	fmt.Printf("%s %d", zone, offset) // 打印：UTC 0
+
 	// —————————————— 获取 *time.Location 指针 ——————————————
 
 	// 获取 UTC 时区
