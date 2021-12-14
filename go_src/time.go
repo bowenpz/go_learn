@@ -175,13 +175,125 @@ import (
 // 通常情况下，优先使用 t.Equal(u)，而不是 t == u，因为 t.Equal 方法更精确，并且能正确处理单 monotonic clock 的 case。
 
 func learnTime() {
+	// —————————————— 获取 time.Time 对象 ——————————————
 
-	// 创建 time.Time 对象
+	// 当前时间
 	now := time.Now()
+	fmt.Printf("%v", now) // 打印：2021-12-10 16:44:10.337708 +0800 CST m=+0.000118756
+
+	// 根据 unix 时间戳获取时间
 	unix := time.Unix(1639094400, 0)
+	fmt.Printf("%v", unix) // 打印：2021-12-10 08:00:00 +0800 CST
+
+	// 根据日期获取时间
 	date := time.Date(2021, time.December, 10, 0, 0, 0, 0, time.UTC)
+	fmt.Printf("%v", date) // 打印：2021-12-10 08:00:00 +0800 CST
+
+	// 根据字符串文本获取时间（默认本地时区）
 	parse, _ := time.Parse("2006-01-02 15:04:05", "2021-12-10 00:00:00")
-	fmt.Printf("%v\n%v\n%v\n%v\n", now, unix, date, parse)
+	fmt.Printf("%v", parse) // 打印：2021-12-10 08:00:00 +0800 CST
+
+	// 根据字符串文本获取时间
+	parseInLocation, _ := time.ParseInLocation("2006-01-02 15:04:05", "2021-12-10 00:00:00", time.Local)
+	fmt.Printf("%v", parseInLocation) // 打印：2021-12-10 00:00:00 +0800 CST
+
+	// —————————————— 获取 *time.Location 指针 ——————————————
+
+	// 获取 UTC 时区
+	utc := time.UTC
+	fmt.Printf("%v", utc) // 打印：UTC
+
+	// 获取当前时区
+	local := time.Local
+	fmt.Printf("%v", local) // 打印：Local
+
+	// 获取指定时区
+	fixedZone := time.FixedZone("HangZhou", 8*3600)
+	fmt.Printf("%v", fixedZone) // 打印：HangZhou
+
+	// 加载时区
+	loadLocation, _ := time.LoadLocation("Asia/Shanghai")
+	fmt.Printf("%v", loadLocation) // 打印：Asia/Shanghai
+
+	// 根据 TZData 加载时区（感觉基本用不上）
+	loadLocationFromTZData, err := time.LoadLocationFromTZData("Asia/Beijing", []byte{})
+	fmt.Printf("%v, %s", loadLocationFromTZData, err) // 打印：UTC, malformed time zone information
+
+	// —————————————— 时间区间 ——————————————
+
+	// 指定时间距今有多长时间（等同于 t.Sub(now)）
+	until := time.Until(time.Date(2021, time.December, 10, 0, 0, 0, 0, time.UTC))
+	fmt.Printf("%v", until) // 打印：-105h50m3.370672s
+
+	// 至今过去了多长时间（等同于 now.Sub(t)）
+	since := time.Since(time.Date(2021, time.December, 10, 0, 0, 0, 0, time.UTC))
+	fmt.Printf("%v", since) // 打印：105h50m3.37071s
+
+	// 根据字符串解析成时间区间
+	parseDuration, _ := time.ParseDuration("1h0m0s")
+	fmt.Printf("%v", parseDuration) // 打印：1h0m0s
+
+	// 除此之外还有一些枚举：
+	// time.Hour
+	// time.Minute
+	// time.Second
+	// time.Millisecond
+	// time.Microsecond
+	// time.Nanosecond
+
+	// —————————————— 直接休眠 ——————————————
+
+	// 让 Goroutine 休眠不少于多少时间
+	time.Sleep(time.Second)
+
+	// —————————————— 计时器 time.Timer ——————————————
+
+	// 休眠一段时间（只暂停一次）
+	timer := time.NewTimer(time.Second)
+	select {
+	case <-timer.C:
+		// ...
+	}
+	// 重新计时
+	timer.Reset(time.Second)
+	// 终止
+	timer.Stop()
+
+	// 计时器 time.Timer 的简易版本，但是内部的 Time 不会被 GC，会造成内存泄漏
+	after := time.After(time.Second)
+	select {
+	case <-after:
+		// ...
+	}
+
+	// 延迟执行方法
+	time.AfterFunc(time.Second, func() {
+		// ...
+	})
+
+	// —————————————— 打点器 time.Ticker ——————————————
+
+	// 多次休眠一段时间（无限次暂停）
+	ticker := time.NewTicker(time.Second)
+	for i := 0; i < 10; i++ {
+		select {
+		case <-ticker.C:
+			// ...
+		}
+	}
+	// 重新计时
+	ticker.Reset(time.Second)
+	// 终止
+	ticker.Stop()
+
+	// 打点器 time.Ticker 的简易版本，适合无限循环（如果不是无限循环，内部的 Ticker 会无法 GC 造成内存泄漏）
+	tick := time.Tick(time.Second)
+	for i := 0; i < 10; i++ {
+		select {
+		case <-tick:
+			// ...
+		}
+	}
 
 	// —————————————— 一些枚举 ——————————————
 
@@ -225,8 +337,14 @@ func learnTime() {
 	}
 	fmt.Printf("%v", durations) // 打印：[1h0m0s 1m0s 1s 1ms 1µs 1ns]
 
+	// 还有一些时间格式的字符串枚举，例如 time.RFC822，就不粘贴了
 }
 
 func separate() {
+	fmt.Printf("\n\n\n")
+}
+func separateInterface(i interface{}) {
+	fmt.Printf("\n\n\n")
+	fmt.Printf("%v", i)
 	fmt.Printf("\n\n\n")
 }
