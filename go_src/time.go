@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"math/rand"
+	"time" // 1.16.5
 )
 
 // —————————————————————————————————————————————
@@ -197,7 +198,7 @@ func learnTime() {
 	parseInLocation, _ := time.ParseInLocation("2006-01-02 15:04:05", "2021-12-10 00:00:00", time.Local)
 	fmt.Printf("%v", parseInLocation) // 打印：2021-12-10 00:00:00 +0800 CST
 
-	// —————————————— 使用 time.Time 对象 ——————————————
+	// —————————————— 使用 time.Time 对象：展示 ——————————————
 
 	// 接下来都使用 2021-01-01 00:00:00 这个时间
 	t := time.Date(2021, time.January, 1, 0, 0, 0, 0, time.UTC)
@@ -220,6 +221,78 @@ func learnTime() {
 	fmt.Printf("%d %d %d %d %d %d %d %d %d\n", year, month, weekday, yearDay, day, hour, minute, second, nanosecond)     // 打印：2021 1 5 1 1 0 0 0 0
 	fmt.Printf("%d %d %d %d %d %d %d %d", isoYear, isoWeek, dateYear, dateMonth, dateDay, clockHour, clockMin, clockSec) // 打印：2020 53 2021 1 1 0 0 0
 
+	// unix 时间（单位：秒）
+	tUnix := t.Unix()
+	fmt.Printf("%d ", tUnix) // 打印：1609459200
+
+	// unix 时间（单位：纳秒）
+	tUnixNano := t.UnixNano()
+	fmt.Printf("%d", tUnixNano) // 打印：1609459200000000000
+
+	// 所在时区
+	location := t.Location()
+	fmt.Printf("%v", location) // 打印：UTC
+
+	// 所在时区与偏移量（秒）
+	zone, offset := t.Zone()
+	fmt.Printf("%s %d", zone, offset) // 打印：UTC 0
+
+	// 设定时区
+	var (
+		inUTC       = t.UTC()                                  // 时区设置为 UTC
+		inLocal     = t.Local()                                // 时区设置为本地
+		inFixedZone = t.In(time.FixedZone("Hangzhou", 8*3600)) // 时区设置为指定时区
+	)
+	fmt.Printf("%v\n%v\n%v", inUTC, inLocal, inFixedZone)
+	// 打印：
+	// 2021-01-01 00:00:00 +0000 UTC
+	// 2021-01-01 08:00:00 +0800 CST
+	// 2021-01-01 08:00:00 +0800 Hangzhou
+
+	// 格式化时间
+	// go 格式化时间非常有病，并不使用 YYYY 之类的占位符，而是使用 go 出生的那一刻作为时间格式：Mon Jan 2 15:04:05 -0700 MST 2006
+	format := t.Format("2006-01-02 15:04:05 MST")
+	fmt.Printf("%s", format) // 打印：2021-01-01 00:00:00 UTC
+
+	// （带前缀）格式化时间
+	appendFormat := t.AppendFormat([]byte("Time: "), "15:04:05 PM")
+	fmt.Printf("%s", appendFormat) // 打印：Time: 00:00:00 AM
+
+	// String 方法
+	// 等同于 t.Format("2006-01-02 15:04:05.999999999 -0700 MST")
+	// 如果有 monotonic clock（例如 time.Now()）按照 m=±ddd.nnnnnnnnn 格式打印
+	tStr := t.String()
+	fmt.Printf("%s", tStr) // 打印：2021-01-01 00:00:00 +0000 UTC
+
+	// 序列化
+	var (
+		encode, _        = t.GobEncode()
+		marshalBinary, _ = t.MarshalBinary()
+		marshalJSON, _   = t.MarshalJSON()
+		marshalText, _   = t.MarshalText()
+	)
+	fmt.Printf("%v\n%v\n%s\n%s", encode, marshalBinary, marshalJSON, marshalText)
+	// 打印：
+	// [1 0 0 0 14 215 128 93 0 0 0 0 0 255 255]
+	// [1 0 0 0 14 215 128 93 0 0 0 0 0 255 255]
+	// "2021-01-01T00:00:00Z"
+	// 2021-01-01T00:00:00Z2021-01-01 00:00:00 +0000 UTC
+
+	// 反序列化
+	decode, m1, m2, m3 := time.Now(), time.Now(), time.Now(), time.Now()
+	decode.GobDecode(encode)
+	m1.UnmarshalBinary(marshalBinary)
+	m2.UnmarshalJSON(marshalJSON)
+	m3.UnmarshalText(marshalText)
+	fmt.Printf("%v\n%v\n%v\n%v", decode, m1, m2, m3)
+	// 打印：
+	// 2021-01-01T00:00:00Z2021-01-01 00:00:00 +0000 UTC
+	// 2021-01-01 00:00:00 +0000 UTC
+	// 2021-01-01 00:00:00 +0000 UTC
+	// 2021-01-01 00:00:00 +0000 UTC
+
+	// —————————————— 使用 time.Time 对象：比较与计算 ——————————————
+
 	// 增加时间
 	add := t.Add(time.Hour * 24)
 	fmt.Printf("%v", add) // 打印：2021-01-02 00:00:00 +0000 UTC
@@ -240,13 +313,28 @@ func learnTime() {
 	isAfter := t.After(time.Now())
 	fmt.Printf("%t", isAfter) // 打印：false
 
-	// 所在时区
-	location := t.Location()
-	fmt.Printf("%v", location) // 打印：UTC
+	// 时间是否相等（即使时区不同也可以相等，因此不建议使用 ==，优先使用 Equal）
+	t1 := t.In(time.FixedZone("zone1", 0))
+	t2 := t.In(time.FixedZone("zone2", 8*3600))
+	fmt.Printf("%t", t1.Equal(t2)) // 打印：true
+	fmt.Printf("%t", t1 == t2)     // 打印：false
 
-	// 所在时区与偏移量（秒）
-	zone, offset := t.Zone()
-	fmt.Printf("%s %d", zone, offset) // 打印：UTC 0
+	// 是否是时间零值（公元 1 年第 0 秒是零值）
+	isZero1 := t.IsZero()
+	isZero2 := time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC).IsZero()
+	fmt.Printf("%t", isZero1) // 打印：false
+	fmt.Printf("%t", isZero2) // 打印：true
+
+	// 时间取整
+	var (
+		randTime = time.Date(2021, time.January, 1, 0, rand.Intn(60), rand.Intn(60), rand.Intn(60), time.UTC)
+		round    = randTime.Round(time.Hour)    // 向上取整
+		truncate = randTime.Truncate(time.Hour) // 向下取整
+	)
+	fmt.Printf("%v\n%v", round, truncate)
+	// 打印：
+	// 2021-01-01 01:00:00 +0000 UTC
+	// 2021-01-01 00:00:00 +0000 UTC
 
 	// —————————————— 获取 *time.Location 指针 ——————————————
 
@@ -259,8 +347,8 @@ func learnTime() {
 	fmt.Printf("%v", local) // 打印：Local
 
 	// 获取指定时区
-	fixedZone := time.FixedZone("HangZhou", 8*3600)
-	fmt.Printf("%v", fixedZone) // 打印：HangZhou
+	fixedZone := time.FixedZone("Hangzhou", 8*3600)
+	fmt.Printf("%v", fixedZone) // 打印：Hangzhou
 
 	// 加载时区
 	loadLocation, _ := time.LoadLocation("Asia/Shanghai")
