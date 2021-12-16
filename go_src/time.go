@@ -327,8 +327,8 @@ func learnTime() {
 
 	// 时间取整
 	var (
-		randTime = time.Date(2021, time.January, 1, 0, rand.Intn(60), rand.Intn(60), rand.Intn(60), time.UTC)
-		round    = randTime.Round(time.Hour)    // 向上取整
+		randTime = time.Date(2021, time.January, 1, 0, 30+rand.Intn(30), rand.Intn(60), rand.Intn(60), time.UTC)
+		round    = randTime.Round(time.Hour)    // 四舍五入取整
 		truncate = randTime.Truncate(time.Hour) // 向下取整
 	)
 	fmt.Printf("%v\n%v", round, truncate)
