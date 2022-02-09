@@ -26,7 +26,7 @@
 
 
 
-| Ioutil 方法                                                  | 功能                                     | Go 1.16 之后推荐替代方法 |
+| ioutil 方法                                                  | 功能                                     | Go 1.16 之后推荐替代方法 |
 | ------------------------------------------------------------ | ---------------------------------------- | ------------------------ |
 | ReadAll<font color="silver">(r io.Reader) ([]byte, error)</font> | 从 io.Reader 中读取全部数据，返回 []byte | io.ReadAll               |
 | ReadDir<font color="silver">(dirname string) ([]fs.FileInfo, error)</font> | 读取目录下的所有文件（向下一级）         | os.ReadDir               |
