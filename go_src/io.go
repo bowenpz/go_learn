@@ -17,6 +17,7 @@ import (
 // 因为这些接口和原语包装的都是原始操作，且实现众多，因此除非有声明，否则使用时不应假设它们并发安全。
 
 // 参考：https://www.cnblogs.com/golove/p/3276678.html
+// buffer：https://cloud.tencent.com/developer/article/1456243
 func learnIO() {
 	buffer := bytes.NewBuffer([]byte{})
 
