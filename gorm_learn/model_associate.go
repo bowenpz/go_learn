@@ -7,8 +7,9 @@ import (
 
 type Department struct {
 	gorm.Model
-	Name      string
-	Employees []Employee
+	DepartmentID int `gorm:"primary_key"`
+	Name         string
+	Employees    []Employee `gorm:"association_foreignkey:DepartmentID;foreignkey:DepartID"`
 }
 
 func (d Department) String() string {
@@ -22,8 +23,9 @@ func (d Department) AfterCreate(tx *gorm.DB) (err error) {
 
 type Employee struct {
 	gorm.Model
-	Name         string
-	DepartmentID int
+	UserID   int `gorm:"primary_key"`
+	Name     string
+	DepartID int
 }
 
 func (e Employee) String() string {
