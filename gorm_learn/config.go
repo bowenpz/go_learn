@@ -56,7 +56,7 @@ func startGorm(dbUser, dbPasswd, dbHost, dbPort, dbName string) error {
 
 func MigrateTable(tables ...interface{}) {
 	// table: optional pointer
-	if len(tables) > 0 {
+	if len(tables) == 0 {
 		return
 	}
 	autoMigrateTables = append(autoMigrateTables, tables...)
