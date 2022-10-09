@@ -1,6 +1,5 @@
 package main
 
 func main() {
-	MySQLVersion5738()
-	MigrateTable()
+	StartGorm(MYSQL_5_7_39)
 }
